@@ -31,14 +31,14 @@ Permissions should be assigned at the narrowest practical scope to reduce the bl
 
 2. Resource groups 
 
-###RG's
+### RG's
 I made 3 resource groups compute-lab, security, and network
 I added tags to each rg for clarity and organization
 All rgs are located in us central
 You can confirm this in the Activity log it shows meta-data on creation and you can confirm. 
 
 
-###Use
+### Use
 Able to add container to separate and hold azure services
 Tags are used to organize, automation, and cost analysis broken into meta-data 
 Activity log shows us what we created and meta-data on when it occurred   
