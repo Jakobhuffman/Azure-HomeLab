@@ -1,0 +1,56 @@
+# Vnet and Subnet Design 
+
+## Virtual Network
+
+-name: vnet-azsec-lab-cus=01
+-region: Central US
+-address space: 10.20.0.0/20
+
+## Subnets 
+
+| Subnet | CIDR | Purpose |
+| Management | 10.20.0.0/24 | Administrative system |
+| Servers | 10.20.1.0/24 | Windows and Linux servers |
+| Workstations | 10.20.2.0/24 | User endpoints |
+| Security | 10.20.3.0/24 | SIEM and monitoring 
+
+## Notes 
+subnets provide segmentation but they do not automatically block traffic. NGRs will enforce traffic rules 
+
+## Cost 
+The VNET and subnets have an expected direct cost of $0 No Bastion, Firewall, VPN gateway, NAT Gateway or public IP was deployed.
+
+## Network Security Groups 
+
+| subnet | Associated NSG |
+| --- | --- |
+| Management | nsg-managment-lab-cus-01 | 
+| Servers | nsg-servers-lab-cus-01 |
+| Workstations | nsg-workstations-lab-cus-01 |
+| Security | nsg-security-lab-cus-01 |
+
+### Current Security state 
+
+I set up 4 NSGs that are associated with their matching subnets only Azure default rules currently exist 
+
+The default AllowVNetInBound and AllowVNetOutBound rules mean that the subnets are not yet isolated from one another 
+
+## Baseline NSG Policy 
+Every NSG has the default inbound rule 
+priority 65000
+protocol: any 
+Action: Allow 
+This makes our 4 subnet not isolated and Azure uses lowest priority first so our custom rules will be be 100 - 4000 I set up a baseline deny at priority 4096 the baseline adds a Zero Trust where anyone on the network is not automatically trusted later we will add narrow rules like " Management -> Linux SSH 22 Allow"S
+
+
+## Cloud Shell 
+I used "$ az network vnet subnet list -g rg-azusec-network-lab-cus-01 --vnet-name vnet-azsec-lab-cus-01 --query "[].{Subnet:name,DefaultOutboundAccess:defaultOu
+tboundAccess}" -o table
+Subnet                        DefaultOutboundAccess
+----------------------------  -----------------------
+snet-management-lab-cus-01    False
+snet-servers-lab-cus-01       False
+snet-workstations-lab-cus-01  False
+snet-security-lab-cus-10      False "
+
+This output can show us the virtual network and the subnets that have outbound access all subnets are false right now meaning we can't access the internet for downloads if we were setting up a VM in these subnets we could not download ubuntu packages and etc. however this setting does not block private communication in the VNet 
